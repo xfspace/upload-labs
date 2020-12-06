@@ -1,31 +1,45 @@
 <?php
-setcookie("pass","19");
 include '../config.php';
 include '../head.php';
 include '../menu.php';
 
 $is_upload = false;
 $msg = null;
-if (isset($_POST['submit'])) {
-    if (file_exists($UPLOAD_ADDR)) {
-        $deny_ext = array("php","php5","php4","php3","php2","html","htm","phtml","pht","jsp","jspa","jspx","jsw","jsv","jspf","jtml","asp","aspx","asa","asax","ascx","ashx","asmx","cer","swf","htaccess");
-
-        $file_name = $_POST['save_name'];
-        $file_ext = pathinfo($file_name,PATHINFO_EXTENSION);
-
-        if(!in_array($file_ext,$deny_ext)) {
-            $img_path = $UPLOAD_ADDR . '/' .$file_name;
-            if (move_uploaded_file($_FILES['upload_file']['tmp_name'], $img_path)) { 
-                $is_upload = true;
-            }else{
-                $msg = '上传失败！';
-            }
-        }else{
-            $msg = '禁止保存为该类型文件！';
-        }
-
-    } else {
-        $msg = $UPLOAD_ADDR . '文件夹不存在,请手工创建！';
+if (isset($_POST['submit']))
+{
+    require_once("./myupload.php");
+    $imgFileName =time();
+    $u = new MyUpload($_FILES['upload_file']['name'], $_FILES['upload_file']['tmp_name'], $_FILES['upload_file']['size'],$imgFileName);
+    $status_code = $u->upload(UPLOAD_PATH);
+    switch ($status_code) {
+        case 1:
+            $is_upload = true;
+            $img_path = $u->cls_upload_dir . $u->cls_file_rename_to;
+            break;
+        case 2:
+            $msg = '文件已经被上传，但没有重命名。';
+            break; 
+        case -1:
+            $msg = '这个文件不能上传到服务器的临时文件存储目录。';
+            break; 
+        case -2:
+            $msg = '上传失败，上传目录不可写。';
+            break; 
+        case -3:
+            $msg = '上传失败，无法上传该类型文件。';
+            break; 
+        case -4:
+            $msg = '上传失败，上传的文件过大。';
+            break; 
+        case -5:
+            $msg = '上传失败，服务器已经存在相同名称文件。';
+            break; 
+        case -6:
+            $msg = '文件无法上传，文件不能复制到目标目录。';
+            break;      
+        default:
+            $msg = '未知错误！';
+            break;
     }
 }
 ?>
@@ -41,8 +55,6 @@ if (isset($_POST['submit'])) {
             <form enctype="multipart/form-data" method="post">
                 <p>请选择要上传的图片：<p>
                 <input class="input_file" type="file" name="upload_file"/>
-                <p>保存名称:<p>
-                <input class="input_text" type="text" name="save_name" style="" /><br/>
                 <input class="button" type="submit" name="submit" value="上传"/>
             </form>
             <div id="msg">

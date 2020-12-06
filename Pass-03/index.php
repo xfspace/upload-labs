@@ -1,5 +1,4 @@
 <?php
-setcookie("pass","03");
 include '../config.php';
 include '../common.php';
 include '../head.php';
@@ -8,7 +7,7 @@ include '../menu.php';
 $is_upload = false;
 $msg = null;
 if (isset($_POST['submit'])) {
-    if (file_exists($UPLOAD_ADDR)) {
+    if (file_exists(UPLOAD_PATH)) {
         $deny_ext = array('.asp','.aspx','.php','.jsp');
         $file_name = trim($_FILES['upload_file']['name']);
         $file_name = deldot($file_name);//删除文件名末尾的点
@@ -18,15 +17,18 @@ if (isset($_POST['submit'])) {
         $file_ext = trim($file_ext); //收尾去空
 
         if(!in_array($file_ext, $deny_ext)) {
-            if (move_uploaded_file($_FILES['upload_file']['tmp_name'], $UPLOAD_ADDR. '/' . $_FILES['upload_file']['name'])) {
-                 $img_path = $UPLOAD_ADDR .'/'. $_FILES['upload_file']['name'];
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.date("YmdHis").rand(1000,9999).$file_ext;            
+            if (move_uploaded_file($temp_file,$img_path)) {
                  $is_upload = true;
+            } else {
+                $msg = '上传出错！';
             }
         } else {
             $msg = '不允许上传.asp,.aspx,.php,.jsp后缀文件！';
         }
     } else {
-        $msg = $UPLOAD_ADDR . '文件夹不存在,请手工创建！';
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
     }
 }
 ?>
@@ -35,7 +37,7 @@ if (isset($_POST['submit'])) {
     <ol>
         <li>
             <h3>任务</h3>
-            <p>上传一个<code>脚本文件</code>到服务器，并能成功执行。</p>
+            <p>上传一个<code>webshell</code>到服务器。</p>
         </li>
         <li>
             <h3>上传区</h3>

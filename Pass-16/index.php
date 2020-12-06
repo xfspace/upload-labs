@@ -1,98 +1,41 @@
 <?php
-setcookie("pass","16");
 include '../config.php';
 include '../head.php';
 include '../menu.php';
 
+function isImage($filename){
+    //需要开启php_exif模块
+    $image_type = exif_imagetype($filename);
+    switch ($image_type) {
+        case IMAGETYPE_GIF:
+            return "gif";
+            break;
+        case IMAGETYPE_JPEG:
+            return "jpg";
+            break;
+        case IMAGETYPE_PNG:
+            return "png";
+            break;    
+        default:
+            return false;
+            break;
+    }
+}
+
 $is_upload = false;
 $msg = null;
-if (isset($_POST['submit'])){
-    // 获得上传文件的基本信息，文件名，类型，大小，临时文件路径
-    $filename = $_FILES['upload_file']['name'];
-    $filetype = $_FILES['upload_file']['type'];
-    $tmpname = $_FILES['upload_file']['tmp_name'];
-
-    $target_path=$UPLOAD_ADDR.basename($filename);
-
-    // 获得上传文件的扩展名
-    $fileext= substr(strrchr($filename,"."),1);
-
-    //判断文件后缀与类型，合法才进行上传操作
-    if(($fileext == "jpg") && ($filetype=="image/jpeg")){
-        if(move_uploaded_file($tmpname,$target_path))
-        {
-            //使用上传的图片生成新的图片
-            $im = imagecreatefromjpeg($target_path);
-
-            if($im == false){
-                $msg = "该文件不是jpg格式的图片！";
-            }else{
-                //给新图片指定文件名
-                srand(time());
-                $newfilename = strval(rand()).".jpg";
-                $newimagepath = $UPLOAD_ADDR.$newfilename;
-                imagejpeg($im,$newimagepath);
-                //显示二次渲染后的图片（使用用户上传图片生成的新图片）
-                $img_path = $UPLOAD_ADDR.$newfilename;
-                unlink($target_path);
-                $is_upload = true;
-            }
-        }
-        else
-        {
-            $msg = "上传失败！";
-        }
-
-    }else if(($fileext == "png") && ($filetype=="image/png")){
-        if(move_uploaded_file($tmpname,$target_path))
-        {
-            //使用上传的图片生成新的图片
-            $im = imagecreatefrompng($target_path);
-
-            if($im == false){
-                $msg = "该文件不是png格式的图片！";
-            }else{
-                 //给新图片指定文件名
-                srand(time());
-                $newfilename = strval(rand()).".png";
-                $newimagepath = $UPLOAD_ADDR.$newfilename;
-                imagepng($im,$newimagepath);
-                //显示二次渲染后的图片（使用用户上传图片生成的新图片）
-                $img_path = $UPLOAD_ADDR.$newfilename;
-                unlink($target_path);
-                $is_upload = true;               
-            }
-        }
-        else
-        {
-            $msg = "上传失败！";
-        }
-
-    }else if(($fileext == "gif") && ($filetype=="image/gif")){
-        if(move_uploaded_file($tmpname,$target_path))
-        {
-            //使用上传的图片生成新的图片
-            $im = imagecreatefromgif($target_path);
-            if($im == false){
-                $msg = "该文件不是gif格式的图片！";
-            }else{
-                //给新图片指定文件名
-                srand(time());
-                $newfilename = strval(rand()).".gif";
-                $newimagepath = $UPLOAD_ADDR.$newfilename;
-                imagegif($im,$newimagepath);
-                //显示二次渲染后的图片（使用用户上传图片生成的新图片）
-                $img_path = $UPLOAD_ADDR.$newfilename;
-                unlink($target_path);
-                $is_upload = true;
-            }
-        }
-        else
-        {
-            $msg = "上传失败！";
-        }
+if(isset($_POST['submit'])){
+    $temp_file = $_FILES['upload_file']['tmp_name'];
+    $res = isImage($temp_file);
+    if(!$res){
+        $msg = "文件未知，上传失败！";
     }else{
-        $msg = "只允许上传后缀为.jpg|.png|.gif的图片文件！";
+        $img_path = UPLOAD_PATH."/".rand(10, 99).date("YmdHis").".".$res;
+        if(move_uploaded_file($temp_file,$img_path)){
+            $is_upload = true;
+        } else {
+            $msg = "上传出错！";
+        }
     }
 }
 ?>
@@ -101,7 +44,11 @@ if (isset($_POST['submit'])){
     <ol>
         <li>
             <h3>任务</h3>
-            <p>上传一个<code>图片马</code>到服务器。</p>
+            <p>上传<code>图片马</code>到服务器。</p>
+            <p>注意：</p>
+            <p>1.保证上传后的图片马中仍然包含完整的<code>一句话</code>或<code>webshell</code>代码。</p>
+            <p>2.使用<a href="<?php echo INC_VUL_PATH;?>" target="_bank">文件包含漏洞</a>能运行图片马中的恶意代码。</p>
+            <p>3.图片马要<code>.jpg</code>,<code>.png</code>,<code>.gif</code>三种后缀都上传成功才算过关！</p>
         </li>
         <li>
             <h3>上传区</h3>

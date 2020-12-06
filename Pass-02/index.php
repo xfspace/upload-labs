@@ -1,5 +1,4 @@
 <?php
-setcookie("pass","02");
 include '../config.php';
 include '../head.php';
 include '../menu.php';
@@ -7,18 +6,20 @@ include '../menu.php';
 $is_upload = false;
 $msg = null;
 if (isset($_POST['submit'])) {
-    if (file_exists($UPLOAD_ADDR)) {
+    if (file_exists(UPLOAD_PATH)) {
         if (($_FILES['upload_file']['type'] == 'image/jpeg') || ($_FILES['upload_file']['type'] == 'image/png') || ($_FILES['upload_file']['type'] == 'image/gif')) {
-            if (move_uploaded_file($_FILES['upload_file']['tmp_name'], $UPLOAD_ADDR . '/' . $_FILES['upload_file']['name'])) {
-                $img_path = $UPLOAD_ADDR . $_FILES['upload_file']['name'];
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH . '/' . $_FILES['upload_file']['name'];          
+            if (move_uploaded_file($temp_file, $img_path)) {
                 $is_upload = true;
-
+            } else {
+                $msg = '上传出错！';
             }
         } else {
             $msg = '文件类型不正确，请重新上传！';
         }
     } else {
-        $msg = $UPLOAD_ADDR.'文件夹不存在,请手工创建！';
+        $msg = UPLOAD_PATH.'文件夹不存在,请手工创建！';
     }
 }
 ?>

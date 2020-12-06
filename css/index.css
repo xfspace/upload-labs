@@ -1,5 +1,12 @@
-﻿body{
+﻿/**
+* author: c0ny1
+* date: 2018-6-13
+* project: https://github.com/c0ny1/upload-labs
+*/
+
+body{
 	margin: 0 0 0 0;
+	min-width: 1340px;/*防止窗口变小导致页面变形*/
 	background: #333333;
 	font-family: Lato, "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", 微软雅黑, sans-serif;
 }
@@ -7,7 +14,6 @@
 #head{
 	width: 100%;
 	margin: 0px auto;
-	/*border: 1px solid #ddd;*/
 	margin-bottom: 10px;
 	min-width: 1050px;
 }
@@ -71,7 +77,6 @@ p code {
 	border: 1px #ddd;
 	width: 100%;
 	float: left;
-
 	border: 1px solid #000;
 	padding-top: 20px;
 	padding-bottom: 20px;	
@@ -85,7 +90,6 @@ p code {
 	margin-left: 40px;
 	
 }
-
 
 #menu ul{
 	margin: 0 0 0 0;
@@ -132,6 +136,16 @@ p code {
 	padding-right: 40px;
 }
 
+#upload_panel a{
+	text-decoration: none;
+	padding: 0px 0px 1px 0px;
+	color: #fff55c;
+}
+
+#upload_panel a:hover {
+	border-bottom:2px solid #FDA162;
+}
+
 .input_file{
 	-webkit-border-radius: 5px;
 	background: #323232;
@@ -139,11 +153,14 @@ p code {
 }
 
 .input_text{
+	padding: 5px;
 	width: 240px;
-	height:22px;
-	-webkit-border-radius: 5px;
-	background: #323232;
+	height: 22px;
+	line-height: 22px;
 	border: 0px;
+	-webkit-border-radius: 5px;
+	color: #888888;
+	background: #323232;
 }
 
 .button{
